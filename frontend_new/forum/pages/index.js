@@ -11,6 +11,7 @@ export default function Home() {
     title: "How to hack this website?",
     numberComments: "2",
     date: new Date(),
+    threadId: "1",
   }
 
 
@@ -25,8 +26,8 @@ export default function Home() {
 </WrapItem>
 
 </Wrap>
-
-<Card title={data.title} numberComments={data.numberComments} date={data.date}></Card>
+<Link href={"/thread/" + data.threadId}><Button ml="900" variant="outline">Sign In</Button></Link>
+<Card title={data.title} numberComments={data.numberComments} date={data.date} threadId={data.threadId}></Card>
 
 
 

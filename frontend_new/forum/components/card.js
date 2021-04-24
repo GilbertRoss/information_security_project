@@ -1,5 +1,5 @@
 import {Component} from 'react';
-import { Box, Badge, Avatar, Wrap, WrapItem, VStack } from "@chakra-ui/react"
+import { Box, Badge, Avatar, Wrap, WrapItem, VStack, Link } from "@chakra-ui/react"
 
 
 class Card extends Component {
@@ -9,6 +9,7 @@ class Card extends Component {
 }
     render() {
     return (
+      <Link href={'/threads/' + this.props.threadId}>
 
       <Box width="1000px" height="100px"  borderWidth="1px" borderRadius="lg" overflow="hidden">
           
@@ -41,6 +42,7 @@ class Card extends Component {
             </WrapItem>
           </Wrap>
         </Box>
+        </Link>
 
 
     );
