@@ -33,18 +33,16 @@ class Card extends Component {
             fontSize="sm"
             textTransform="uppercase"
           >
-          {this.props.numberComments} response &bull;  date: {this.props.date.toGMTString()}
+          {this.props.numberComments} response &bull;  date: {this.props.date}
           </Box>
           </VStack>
            </WrapItem>
             <WrapItem>
-              <Avatar name="Dan Abrahmov" src="https://bit.ly/dan-abramov" />
+              <Avatar name={this.props.nameAvatar} src={this.props.urlAvatar} />
             </WrapItem>
           </Wrap>
         </Box>
         </Link>
-
-
     );
 }
 }
