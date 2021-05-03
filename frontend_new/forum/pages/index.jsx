@@ -2,8 +2,8 @@ import Head from 'next/head'
 import Link from 'next/link'
 import styles from '../styles/Home.module.css'
 import Card from '../components/card.jsx'
-import { Flex, Breadcrumb, BreadcrumbItem, BreadcrumbLink, VStack, Wrap, WrapItem, Button } from "@chakra-ui/react"
-import Login from './login'
+import { Flex, Breadcrumb, BreadcrumbItem, BreadcrumbLink, VStack, Wrap, WrapItem, Button, HStack } from "@chakra-ui/react"
+import Login from './login.jsx'
 import React, {useState, useEffect} from 'react'
 
 
@@ -33,14 +33,13 @@ fetchThreads()
   return (
     <Flex width="full" align="center" justifyContent="center" mt="10px">
     <VStack>
-    <Wrap>
+    <HStack>
     
-<WrapItem>
 
 <Link href="/login"><Button ml="900" variant="outline">Sign In</Button></Link>
-</WrapItem>
+<Link href="/register"><Button ml="900" variant="outline">Sign Up</Button></Link>
 
-</Wrap>
+</HStack>
 <ThreadsContext.Provider value={{threads, fetchThreads}}>
       
       {threads.map((thread) => (

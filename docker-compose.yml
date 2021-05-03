@@ -14,17 +14,15 @@ services:
       - db
 
   db:
-    image: "postgres:alpine"
-    restart: always
+    image: "postgres:12.0-alpine"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
     environment:
-      POSTGRES_DB: messages
+      POSTGRES_DB: forum
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD: un!bz4r3Gis
-      PGDATA: /var/lib/postgresql/data
+      POSTGRES_PASSWORD: un!bz1nf0S3c
     ports:
       - "5432:5432"
-    volumes:
-      - db-data:/var/lib/postgresql/data
 
   pgadmin:
      image: dpage/pgadmin4
@@ -39,7 +37,7 @@ services:
        - pgadmin-data:/var/lib/pgadmin
       
 volumes:
-  db-data:
   pgadmin-data:
+  postgres_data:
            
 

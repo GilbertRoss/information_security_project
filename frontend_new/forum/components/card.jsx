@@ -1,5 +1,5 @@
 import {Component} from 'react';
-import { Box, Badge, Avatar, Wrap, WrapItem, VStack, Link } from "@chakra-ui/react"
+import { Box, Flex, Avatar, HStack, Spacer, VStack, Link } from "@chakra-ui/react"
 
 
 class Card extends Component {
@@ -13,34 +13,35 @@ class Card extends Component {
 
       <Box width="1000px" height="100px"  borderWidth="1px" borderRadius="lg" overflow="hidden">
           
-          <Wrap m="20px 10px" spacing="500px">
+          <HStack m="20px 10px" spacing="500px">
           
-            <WrapItem>
-             <VStack> 
+             <Flex>
+             <HStack mr="50px">
+              <Avatar name={this.props.nameAvatar} src={this.props.urlAvatar} />
+            </HStack> 
             <Box
             color="black.500"
             fontWeight="semibold"
             letterSpacing="wide"
             fontSize="24px"
             textTransform="uppercase"
-            ml="2"
+            postion= "absolute"
+            align= "self-start"
           >
             {this.props.title} 
           </Box>
-          <Box
+          <Spacer />
+          <Flex
             color="gray.500"
             fontWeight="semibold"
             fontSize="sm"
             textTransform="uppercase"
+            align="self-start"
           >
           {this.props.numberComments} response &bull;  date: {this.props.date}
-          </Box>
-          </VStack>
-           </WrapItem>
-            <WrapItem>
-              <Avatar name={this.props.nameAvatar} src={this.props.urlAvatar} />
-            </WrapItem>
-          </Wrap>
+          </Flex>
+          </Flex>
+        </HStack>
         </Box>
         </Link>
     );

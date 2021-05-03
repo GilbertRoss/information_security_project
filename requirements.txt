@@ -1,3 +1,9 @@
 fastapi
+asyncpg
 uvicorn
 pydantic
+tortoise-orm
+passlib
+bcrypt
+pyjwt
+python-multipart
