@@ -10,25 +10,26 @@ import {
     Button,
     CircularProgress,
 } from '@chakra-ui/react'
-import {useRouter} from 'next/router'
+import {useRouter, Router} from 'next/router'
 
 function Register(){
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    let router = useRouter()
 
     const handleSubmit = async event => {
       event.preventDefault();
       setIsLoading(true);
       try{
         let response = await userRegister({username, password});
-        console.log(response)
         if(response != 200){
           throw 'error'
         }
         setIsLoading(false);
         setError('')
+        router.push('/registercomplete')
       }catch(e){
         setError('Username already exists!');
 
