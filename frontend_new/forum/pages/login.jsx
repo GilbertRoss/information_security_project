@@ -70,11 +70,11 @@ function Login(){
           {error && <ErrorMessage message={error} />}
             <FormControl isRequired>
               <FormLabel>Username</FormLabel>
-              <Input type="text" onChange={event => setUsername(event.currentTarget.value)} placeholder="iAmNotAH4cker" />
+              <Input type="text" value={username} onChange={event => setUsername(event.currentTarget.value)} placeholder="iAmNotAH4cker" />
             </FormControl>
             <FormControl mt={6} isRequired>
               <FormLabel>Password</FormLabel>
-              <Input type="password" onChange={event => setPassword(event.currentTarget.value)} placeholder="*******" />
+              <Input type="password" value={password} onChange={event => setPassword(event.currentTarget.value)} placeholder="*******" />
             </FormControl>
             <Button width="full" mt={4} type="submit">
             {isLoading ? (
