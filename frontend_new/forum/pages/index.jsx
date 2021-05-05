@@ -25,6 +25,7 @@ const response = await fetch("http://localhost:8080/threads", {
     credentials: 'same-origin', // include, *same-origin, omit
     })
 const threads = await response.json()
+console.log(threads);
 console.log(cookies.getItem("auth"))
 setThreads(threads.data)
 }
@@ -46,7 +47,7 @@ fetchThreads()
 <ThreadsContext.Provider value={{threads, fetchThreads}}>
       
       {threads.map((thread) => (
-          <Card title={thread.title} numberComments={thread.numberComments} date={thread.date} threadId={thread.threadId} nameAvatar={thread.nameAvatar} urlAvatar={thread.urlAvatar}></Card>
+          <Card title={thread.title} date={thread.date} threadId={thread.id}></Card>
         ))}      
       </ThreadsContext.Provider>
 

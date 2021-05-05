@@ -17,7 +17,7 @@ class Card extends Component {
           
              <Flex>
              <HStack mr="50px">
-              <Avatar name={this.props.nameAvatar} src={this.props.urlAvatar} />
+              <Avatar name="Sadman" />
             </HStack> 
             <Box
             color="black.500"
@@ -38,7 +38,7 @@ class Card extends Component {
             textTransform="uppercase"
             align="self-start"
           >
-          {this.props.numberComments} response &bull;  date: {this.props.date}
+          date: {this.props.date}
           </Flex>
           </Flex>
         </HStack>

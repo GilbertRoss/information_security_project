@@ -63,8 +63,7 @@ async def authentiate_user(username: str, password:str):
 
 @app.get("/threads", tags=["threads"])
 async def get_threads() -> dict:
-    threads = await Threads.all()
-    print(threads)
+    threads = await Threads.all().select_related("username_id")
     return { "data": threads }
 
 @app.post('/token')
