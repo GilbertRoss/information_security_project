@@ -7,7 +7,7 @@ from tortoise.contrib.pydantic import pydantic_model_creator
 import jwt
 import datetime
 from pydantic import BaseModel
-from models.db_models import ForumUser
+from db_models import ForumUser, Threads
 from passlib.hash import bcrypt
 
 
@@ -38,51 +38,20 @@ class LoginModel(BaseModel):
 register_tortoise(
     app,
     db_url = 'postgres://admin:un!bz1nf0S3c@db:5432/forum',
-    modules ={'models': ['models.db_models']},
+    modules ={'models': ['db_models']},
     generate_schemas = True,
     add_exception_handlers = True,
     )
 
 User_Pydantic =  pydantic_model_creator(ForumUser, name='User')
 UserIn_Pydantic = pydantic_model_creator(ForumUser, name='UserIn', exclude_readonly=True)
+Thread_Pydantic = pydantic_model_creator(Threads, name="Thread")
+ThreadIn_Pydantic = pydantic_model_creator(Threads, name="ThreadIn", exclude_readonly=True)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 
-threads = [
-     {
-    "title": "How to hack this lol?",
-    "numberComments": "2",
-    "date": "Sat, 01 May 2021 19:38:20 GMT",
-    "threadId": "1",
-    "nameAvatar": "Sadman Bhuiyan",
-    "urlAvatar": "https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraight&accessoriesType=Blank&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Default&eyebrowType=Default&mouthType=Default&skinColor=Light"
-    },
-    {
-    "title": "How to hack this lol?",
-    "numberComments": "2",
-    "date": "Sat, 01 May 2021 19:38:20 GMT",
-    "threadId": "2",
-    "nameAvatar": "Sadman Bhuiyan",
-    "urlAvatar": "https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraight&accessoriesType=Blank&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Default&eyebrowType=Default&mouthType=Default&skinColor=Light"
-    },
-     {
-    "title": "What should I do jelo helojjkgfdsdfghjkljhgfdfghjk?",
-    "numberComments": "2",
-    "date": "Sat, 01 May 2021 21:38:20 GMT",
-    "threadId": "3",
-    "nameAvatar": "Sadman Bhuiyan",
-    "urlAvatar": "https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraight&accessoriesType=Blank&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Default&eyebrowType=Default&mouthType=Default&skinColor=Light"
-    },
-     {
-    "title": "How to hack this lol?",
-    "numberComments": "4",
-    "date": "Sat, 01 May 2021 19:38:20 GMT",
-    "threadId": "3",
-    "nameAvatar": "Sadman Bhuiyan",
-    "urlAvatar": "https://avataaars.io/?avatarStyle=Circle&topType=LongHairStraight&accessoriesType=Blank&hairColor=BrownDark&facialHairType=Blank&clotheType=BlazerShirt&eyeType=Default&eyebrowType=Default&mouthType=Default&skinColor=Light"
-    }
-]
+
 
 async def authentiate_user(username: str, password:str):
     user = await ForumUser.get(username = username)
@@ -94,6 +63,8 @@ async def authentiate_user(username: str, password:str):
 
 @app.get("/threads", tags=["threads"])
 async def get_threads() -> dict:
+    threads = await Threads.all()
+    print(threads)
     return { "data": threads }
 
 @app.post('/token')
@@ -105,7 +76,7 @@ async def generate_token(data: LoginModel, response: Response):
         return {'error' : 'invalid credentials'}
     user_obj = await User_Pydantic.from_tortoise_orm(user)
     user_obj = {"exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=30), 'username': user_obj.username, 'password_hash': user_obj.password_hash}
-    token = jwt.encode(user_obj, 'secret')
+    token = jwt.encode(user_obj, 'un1bzinfoS3c')
 
     response.set_cookie(key='auth', value= token, max_age=1800, httponly=False, expires=1800)
     response.status_code = status.HTTP_200_OK
@@ -113,6 +84,12 @@ async def generate_token(data: LoginModel, response: Response):
     return {'access_token': token , 'token_type' : 'bearer' }
 
 
+@app.post('/createthread', response_model=Thread_Pydantic)
+async def create_thread(thread:ThreadIn_Pydantic, response: Response):
+    thread_obj = Threads(title=thread.title, username_id=thread.username_id)
+    await thread_obj.save()
+
+    return response.status_code
 
 @app.post('/users', response_model=User_Pydantic)
 async def create_user(user:UserIn_Pydantic, response: Response):

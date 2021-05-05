@@ -5,6 +5,8 @@ import Card from '../components/card.jsx'
 import { Flex, Breadcrumb, BreadcrumbItem, BreadcrumbLink, VStack, Wrap, WrapItem, Button, HStack } from "@chakra-ui/react"
 import Login from './login.jsx'
 import React, {useState, useEffect} from 'react'
+import cookies from 'js-cookies';
+
 
 
 export default function Home() {
@@ -23,6 +25,7 @@ const response = await fetch("http://localhost:8080/threads", {
     credentials: 'same-origin', // include, *same-origin, omit
     })
 const threads = await response.json()
+console.log(cookies.getItem("auth"))
 setThreads(threads.data)
 }
 useEffect(() => {
