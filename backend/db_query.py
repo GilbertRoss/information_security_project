@@ -44,5 +44,11 @@ async def query_GET(query):
     cur.close()
     conn.close()
 
+    if(len(rows) < 1):
+        return None
+    if(len(rows) > 1):
+        return rows
+
+
     return rows[0]
 

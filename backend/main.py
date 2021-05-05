@@ -76,7 +76,6 @@ async def authentiate_user(username: str, password:str):
     query = "SELECT * FROM forumuser where username = " + "'" + username + "'"
     #select * from forumuser WHERE username = 'chiara'
     user = await query_GET(query)
-    print(user.username)
 
     if not user:
         return False
