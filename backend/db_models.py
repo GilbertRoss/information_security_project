@@ -19,9 +19,9 @@ class ForumUser(Model):
 class Threads(Model):
     id = fields.UUIDField(pk=True)
     title = fields.CharField(50, unique=True)
-    username_id = fields.ForeignKeyField(model_name='models.ForumUser', related_name='threads')
-    username_id = fields.UUIDField(pk=False)
     date = fields.DatetimeField(auto_now=True)
+    username = fields.UUIDField(pk=True)
+    username = fields.ForeignKeyField('models.ForumUser', related_name='threads')
 
     @classmethod
     async def get_thread(cls, username):
