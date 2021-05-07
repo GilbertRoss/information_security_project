@@ -1,6 +1,6 @@
 import { VStack, HStack, Box, Textarea, Button, Spacer, Flex} from '@chakra-ui/react';
 import {Component} from 'react';
-import PostComponent from './postcomponent';
+import PostComponent from './postcomponent.jsx';
 
 
 
@@ -12,6 +12,8 @@ class Threadscomponent extends Component{
   
 
     render(){
+
+      
       
     return(
       <VStack  mt="100px">
@@ -34,7 +36,7 @@ class Threadscomponent extends Component{
         
          </Box>
       </HStack> 
-      <PostComponent threadPost={this.props.threadPost}></PostComponent>
+      <PostComponent date={this.props.date} post_text={this.props.post_text} username={this.props.username}></PostComponent>
       <HStack width="1210px">
       <Textarea placeholder="Answer to this thread" />
       <Button colorScheme="teal" variant="outline">

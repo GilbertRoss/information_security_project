@@ -1,7 +1,11 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
-import { VStack, Flex, Button, Input, Textarea, Heading } from '@chakra-ui/react';
+import { VStack, Flex, Button, InputText,Input, Textarea, Heading } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import ErrorMessage from '../components/errormessage.jsx'
+import cookies from 'js-cookies'
+import jwt from 'jwt-decode'
+import jwtDecode from 'jwt-decode';
+
 
 
 function CreateThread() {
@@ -9,37 +13,19 @@ function CreateThread() {
     const [title, setTitle] = useState('');
     const [text, setText] = useState('');
     const [error, setError] = useState('');
+    const cookie = cookies.getItem('auth')
+    const user = jwtDecode(cookie).id
+    console.log(user)
 
-    const handleTextChange = (e) => {
-        let inputText = e.target.text;
-        setText(inputText)
-
-    }
-
-    const handleTitleChange = (e) => {
-        let inputTitle = e.target.title;
-        setTitle(inputText)
-    }
-
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e : React.FormEvent) =>{
         e.preventDefault();
-        try{
-        let response = await createThread({title, text})
-        if(response != 200){
-            throw 'error';
-        }
-        } catch(err){
-            setError('Please fill text area or write a title!')
-        }
-
-    }
-
-    const createThread = async ({title, text}) => {
-        let status_code = 0
-        await fetch("http://localhost:8080/", {
+        let status_code = 0;
+        const formData = new FormData(e.target as HTMLFormElement);
+        await fetch("http://localhost:8080/createthread", {
             body: JSON.stringify({
-                username: username,
-                password_hash: password,
+                title: formData.get('title'),
+                user_id: user,
+                text: formData.get('text')
             }),
             headers: {
                 Accept: "application/json",
@@ -49,11 +35,12 @@ function CreateThread() {
             credentials: 'include'
         }
         ).then(resp => {
-            resp.json()
             status_code = resp.status;
-        })
-        return status_code;
-    };
+            return status_code
+        }).catch(e => {return {"message": "Something went wrong"}})
+    }
+    
+
 
 
 
@@ -63,16 +50,18 @@ return (
     <Flex width="full" align="center" justifyContent="center">
         <VStack width="500px">
         <Heading>Create Thread</Heading>
-            <Input
-               value={title}
-               onChange={handleTitleChange}
+        <Input
+               type="text"
+               id="title"
                placeholder="Write a nice title"
+               name="title"
             >
             </Input>
 
             <Textarea
-                value={text}
-                onChange={handleTextChange}
+                type="text"
+                id="text"
+                name="text"
                 placeholder="Type something"
                 height="200px"
             />

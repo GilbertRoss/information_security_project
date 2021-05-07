@@ -45,32 +45,25 @@ class ForumUserNew(BaseModel):
     username: str
     password_hash: str
 
-    
+class CreateThreadModel(BaseModel):
+    title: str
+    user_id: str
+    text: str
 
-class CreateThreadModel(Model):
-    title =  fields.CharField(50, unique=True)
-    username =  fields.UUIDField(pk=False)
+class CreatePostModel(BaseModel):
+    post_text: str
+    user_id: str
 
 
 
-register_tortoise(
-    app,
-    db_url = 'postgres://admin:un!bz1nf0S3c@db:5432/forum',
-    modules ={'models': ['db_models']},
-    generate_schemas = True,
-    add_exception_handlers = True,
-    )
 
-User_Pydantic =  pydantic_model_creator(ForumUser, name='User')
-UserIn_Pydantic = pydantic_model_creator(ForumUser, name='UserIn', exclude_readonly=True)
-Thread_Pydantic = pydantic_model_creator(Threads, name="Thread")
-ThreadIn_Pydantic = pydantic_model_creator(CreateThreadModel, name="ThreadIn")
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 
 def verify_pass(user, password):
-        return bcrypt.verify(password, user.password_hash)
+        return bcrypt.verify(password, user['password_hash'])
 
 async def authentiate_user(username: str, password:str):
     query = "SELECT * FROM forumuser where username = " + "'" + username + "'"
@@ -79,14 +72,33 @@ async def authentiate_user(username: str, password:str):
 
     if not user:
         return False
-    if not verify_pass(user, password):
+    if not verify_pass(user[0], password):
         return False
-    return user
+    return user[0]
 
-@app.get("/threads", tags=["threads"])
+@app.get("/threads")
 async def get_threads() -> dict:
-    threads = await Threads.all().select_related("username_id")
+    query = "SELECT * FROM threads"
+    threads = await query_GET(query)
+    json_output = []
+    for thread in threads:
+        json_output.append({"id": thread['thread_id'], "title": thread['title'], "date": str(thread['date']), "username": thread['user_id']})    
+
+    #threads = await Threads.all().select_related("username_id")
     return { "data": threads }
+
+@app.get("/posts")
+async def get_threads() -> dict:
+    query = "SELECT posts.post_id,posts.date, posts.post_text, forumuser.username, threads.title FROM posts ,forumuser, threads WHERE  posts.user_id = forumuser.user_id AND posts.thread_id = threads.thread_id"
+    posts = await query_GET(query)
+    
+    print(posts)
+    json_output = []
+    for post in posts:
+        json_output.append({"id": post['post_id'], "title": post['title'], "date": str(post['date']), "username": post['username'], "post_text": post['post_text']})    
+
+    #threads = await Threads.all().select_related("username_id")
+    return { "data": json_output }
 
 @app.post('/token')
 async def generate_token(data: LoginModel, response: Response):
@@ -96,7 +108,7 @@ async def generate_token(data: LoginModel, response: Response):
         response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
         return {'error' : 'invalid credentials'}
     
-    user_obj = {"exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=30), 'username': user.username, 'password_hash': user.password_hash}
+    user_obj = {"exp": datetime.datetime.now() + datetime.timedelta(minutes=30), 'username': user['username'], 'password_hash': user['password_hash'], 'id':user['user_id']}
     token = jwt.encode(user_obj, 'un1bzinfoS3c')
 
     response.set_cookie(key='auth', value= token, max_age=1800, httponly=False, expires=1800)
@@ -105,12 +117,33 @@ async def generate_token(data: LoginModel, response: Response):
     return {'access_token': token , 'token_type' : 'bearer' }
 
 
-@app.post('/createthread', response_model=Thread_Pydantic)
-async def create_thread(thread:ThreadIn_Pydantic, response: Response):
-    thread_obj = Threads(title=thread.title, username=thread.username)
-    await thread_obj.save()
+@app.post('/createthread', response_model=CreateThreadModel)
+async def create_thread(thread:CreateThreadModel, response: Response):
+    date =  str(datetime.datetime.now())
+    query_insert_thread = "INSERT INTO threads (thread_id, title, date,user_id) values (" + "'" + str(uuid.uuid4()) + "'," + "'" + thread.title +"'" + "," + "'" + date + "'" + "," + "'" + thread.user_id + "'" + ")"
+    query_get_threadID = "SELECT thread_id FROM threads where title = " + "'" + thread.title + "'"
+    print("outside try")
 
-    return response.status_code
+    try:
+        thread_obj = await query_POST(query_insert_thread)
+        thread_id = await query_GET(query_get_threadID)
+        query_insert_post = "INSERT INTO posts (post_id, post_text, date, thread_id, user_id) values (" + "'" + str(uuid.uuid4()) + "'," + "'" + thread.text +"'" + "," + "'" + date + "'" + "," + "'" + thread_id[0]['thread_id'] + "'," + "'" + thread.user_id + "')"
+        post_obj = await query_POST(query_insert_post)
+    except Exception as e:
+        print(e)
+
+    return thread_obj
+
+@app.post('/createpost', response_model=CreatePostModel)
+async def create_post(post:CreatePostModel, response: Response):
+        date =  str(datetime.datetime.now())
+        query = "INSERT INTO posts (post_id, post_text, date, thread_id, user_id) values (" + "'" + str(uuid.uuid4()) + "'," + "'" + post.text +"'" + "," + "'" + date + "'" + "," + "'" + post.thread_id + "'" + ")"
+
+
+
+
+        return
+
 
 @app.post('/users', response_model=ForumUserNew)
 async def create_user(user:ForumUserNew, response: Response):
@@ -120,7 +153,7 @@ async def create_user(user:ForumUserNew, response: Response):
 
     print(hashed_password + " " + user.password_hash)
 
-    query = ("INSERT INTO forumuser (id, username, password_hash) VALUES (" + "'" + str(uuid.uuid4()) + "'," + "'" + user.username +"'" + "," + "'" + hashed_password + "'" + ")")
+    query = ("INSERT INTO forumuser (user_id, username, password_hash) VALUES (" + "'" + str(uuid.uuid4()) + "'," + "'" + user.username +"'" + "," + "'" + hashed_password + "'" + ")")
 
     try: 
         response = await query_POST(query)
@@ -128,3 +161,4 @@ async def create_user(user:ForumUserNew, response: Response):
         response = {"message": "some type of error"}
 
     return response
+

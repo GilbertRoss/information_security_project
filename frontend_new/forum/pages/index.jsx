@@ -26,7 +26,6 @@ const response = await fetch("http://localhost:8080/threads", {
     })
 const threads = await response.json()
 console.log(threads);
-console.log(cookies.getItem("auth"))
 setThreads(threads.data)
 }
 useEffect(() => {
@@ -47,7 +46,7 @@ fetchThreads()
 <ThreadsContext.Provider value={{threads, fetchThreads}}>
       
       {threads.map((thread) => (
-          <Card title={thread.title} date={thread.date} threadId={thread.id}></Card>
+          <Card title={thread.title} date={thread.date} threadId={thread.thread_id}></Card>
         ))}      
       </ThreadsContext.Provider>
 

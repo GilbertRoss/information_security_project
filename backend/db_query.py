@@ -1,6 +1,7 @@
 import psycopg2
 import psycopg2.extras
 import json
+import re
 
 async def query_POST(query):
     try: 
@@ -29,16 +30,18 @@ async def query_GET(query):
         print('connected to db')
     except Exception as e:
         print(e)
+        return {"message": "error in excuting query"}
 
-    cur = conn.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
+    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
     try:
         cur.execute(query)
         rows = cur.fetchall()
-
+        print(rows)
         print('query executed')
     except Exception as e:
         print("Error in executing query")
         print(e)
+        return {"message": "error in executing query"}
 
     conn.commit()
     cur.close()
@@ -46,9 +49,6 @@ async def query_GET(query):
 
     if(len(rows) < 1):
         return None
-    if(len(rows) > 1):
-        return rows
-
-
-    return rows[0]
+    
+    return rows
 

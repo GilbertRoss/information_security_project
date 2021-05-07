@@ -3,6 +3,7 @@ version: '3.7'
 
 services:
   web:
+    restart: always
     build: .
     working_dir: /home/fastapi/web
     command: "uvicorn main:app --host 0.0.0.0 --port 8080"
@@ -15,8 +16,10 @@ services:
 
   db:
     image: "postgres:12.0-alpine"
+    restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       POSTGRES_DB: forum
       POSTGRES_USER: admin
