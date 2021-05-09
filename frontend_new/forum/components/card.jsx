@@ -17,7 +17,7 @@ class Card extends Component {
           
              <Flex>
              <HStack mr="50px">
-              <Avatar name="Sadman" />
+              <Avatar name={this.props.username} />
             </HStack> 
             <Box
             color="black.500"

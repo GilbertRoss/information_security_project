@@ -24,7 +24,7 @@ CREATE TABLE public.threads
 CREATE TABLE public.posts
 (
     post_id uuid NOT NULL,
-    post_text character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    post_text character varying(500) COLLATE pg_catalog."default" NOT NULL,
     date timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     thread_id uuid NOT NULL,
     user_id uuid NOT NULL,

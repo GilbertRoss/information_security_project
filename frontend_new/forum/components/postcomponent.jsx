@@ -8,6 +8,8 @@ class PostComponent extends Component {
         super(props);
     }
 
+   
+
     render() {
         return (
             <HStack>
@@ -17,7 +19,7 @@ class PostComponent extends Component {
       </VStack>
       </Box>
       <Box shadow="md" borderWidth="1px" borderRadius="1px" width="1000px" height="400px" ml="30px">
-          {this.props.post_text}
+      <div dangerouslySetInnerHTML={{__html: this.props.post_text}}></div>
       </Box>
 
   </HStack>

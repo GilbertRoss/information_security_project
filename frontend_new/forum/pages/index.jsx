@@ -46,7 +46,7 @@ fetchThreads()
 <ThreadsContext.Provider value={{threads, fetchThreads}}>
       
       {threads.map((thread) => (
-          <Card title={thread.title} date={thread.date} threadId={thread.thread_id}></Card>
+          <Card title={thread.title} date={thread.date} threadId={thread.thread_id} username={thread.username}></Card>
         ))}      
       </ThreadsContext.Provider>
 

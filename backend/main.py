@@ -78,11 +78,12 @@ async def authentiate_user(username: str, password:str):
 
 @app.get("/threads")
 async def get_threads() -> dict:
-    query = "SELECT * FROM threads"
+    query = "SELECT threads.thread_id, threads.title, threads.date, forumuser.username FROM threads, forumuser WHERE threads.user_id = forumuser.user_id"
     threads = await query_GET(query)
+    print(threads)
     json_output = []
     for thread in threads:
-        json_output.append({"id": thread['thread_id'], "title": thread['title'], "date": str(thread['date']), "username": thread['user_id']})    
+        json_output.append({"id": thread['thread_id'], "title": thread['title'], "date": str(thread['date']), "username": thread['username']})    
 
     #threads = await Threads.all().select_related("username_id")
     return { "data": threads }
