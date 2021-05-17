@@ -11,6 +11,8 @@ class PostComponent extends Component {
    
 
     render() {
+
+
         return (
             <HStack>
       <Box shadow="md" borderWidth="1px" borderRadius="1px" width="200px" height="400px">

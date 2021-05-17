@@ -51,8 +51,9 @@ class CreateThreadModel(BaseModel):
     text: str
 
 class CreatePostModel(BaseModel):
-    post_text: str
+    text: str
     user_id: str
+    thread_id: str
 
 
 
@@ -88,15 +89,15 @@ async def get_threads() -> dict:
     #threads = await Threads.all().select_related("username_id")
     return { "data": threads }
 
-@app.get("/posts")
-async def get_threads() -> dict:
-    query = "SELECT posts.post_id,posts.date, posts.post_text, forumuser.username, threads.title FROM posts ,forumuser, threads WHERE  posts.user_id = forumuser.user_id AND posts.thread_id = threads.thread_id"
+@app.get("/posts/")
+async def get_threads(thread_id) -> dict:
+    query = "SELECT posts.post_id,posts.date, posts.post_text, forumuser.username, threads.title, posts.thread_id FROM posts ,forumuser, threads WHERE  posts.user_id = forumuser.user_id AND posts.thread_id = threads.thread_id AND posts.thread_id =" + "'" + thread_id + "'" 
     posts = await query_GET(query)
     
     print(posts)
     json_output = []
     for post in posts:
-        json_output.append({"id": post['post_id'], "title": post['title'], "date": str(post['date']), "username": post['username'], "post_text": post['post_text']})    
+        json_output.append({"id": post['post_id'], "title": post['title'], "date": str(post['date']), "username": post['username'], "post_text": post['post_text'], "thread_id": post['thread_id']})    
 
     #threads = await Threads.all().select_related("username_id")
     return { "data": json_output }
@@ -138,12 +139,15 @@ async def create_thread(thread:CreateThreadModel, response: Response):
 @app.post('/createpost', response_model=CreatePostModel)
 async def create_post(post:CreatePostModel, response: Response):
         date =  str(datetime.datetime.now())
-        query = "INSERT INTO posts (post_id, post_text, date, thread_id, user_id) values (" + "'" + str(uuid.uuid4()) + "'," + "'" + post.text +"'" + "," + "'" + date + "'" + "," + "'" + post.thread_id + "'" + ")"
+        query = "INSERT INTO posts (post_id, post_text, date, thread_id, user_id) values (" + "'" + str(uuid.uuid4()) + "'," + "'" + post.text +"'" + "," + "'" + date + "'" + "," + "'" + post.thread_id + "'" + "," + "'" + post.user_id + "'" + ")"
+
+        try:
+            post_obj = await query_POST(query)
+        except Exception as e:
+            print(e)
 
 
-
-
-        return
+        return post_obj
 
 
 @app.post('/users', response_model=ForumUserNew)
