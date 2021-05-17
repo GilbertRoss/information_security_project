@@ -22,9 +22,7 @@ import uuid
 app = FastAPI()
 
 origins = [
-    "http://localhost:3000",
-    "localhost:8080",
-    "localhost:3000",
+    "*"
 ]
 
 app.add_middleware(
@@ -89,8 +87,22 @@ async def get_threads() -> dict:
     #threads = await Threads.all().select_related("username_id")
     return { "data": threads }
 
+@app.get("/search/")
+async def search(search_query) -> dict:
+    query = "SELECT threads.thread_id, threads.title, threads.date, forumuser.username FROM threads, forumuser WHERE threads.user_id = forumuser.user_id AND threads.title LIKE '%" + search_query +"%'"
+    threads = await query_GET(query)
+    print(threads)
+    json_output = []
+    for thread in threads:
+        json_output.append({"id": thread['thread_id'], "title": thread['title'], "date": str(thread['date']), "username": thread['username']})    
+
+    #threads = await Threads.all().select_related("username_id")
+    return { "data": threads }
+
+
+
 @app.get("/posts/")
-async def get_threads(thread_id) -> dict:
+async def get_posts(thread_id) -> dict:
     query = "SELECT posts.post_id,posts.date, posts.post_text, forumuser.username, threads.title, posts.thread_id FROM posts ,forumuser, threads WHERE  posts.user_id = forumuser.user_id AND posts.thread_id = threads.thread_id AND posts.thread_id =" + "'" + thread_id + "'" 
     posts = await query_GET(query)
     
