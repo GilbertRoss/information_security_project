@@ -2,9 +2,19 @@
 version: '3.7'
 
 services:
+  frontend:
+    restart: always
+    build: ./frontend
+    working_dir: /home/react/frontend
+    command: "yarn start"
+    volumes: 
+      - ./frontend:/home/react/frontend
+    ports:
+      - 3000:3000
+
   web:
     restart: always
-    build: .
+    build: ./backend
     working_dir: /home/fastapi/web
     command: "uvicorn main:app --host 0.0.0.0 --port 8080"
     volumes:
