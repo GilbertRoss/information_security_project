@@ -22,7 +22,9 @@ import uuid
 app = FastAPI()
 
 origins = [
-    "*"
+    "http://localhost:3000",
+    "localhost:8080",
+    "localhost:3000",
 ]
 
 app.add_middleware(
@@ -61,7 +63,7 @@ class CreatePostModel(BaseModel):
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 
-def verify_pass(user, password):
+def  verify_pass(user, password):
         return bcrypt.verify(password, user['password_hash'])
 
 async def authentiate_user(username: str, password:str):
@@ -71,7 +73,7 @@ async def authentiate_user(username: str, password:str):
 
     if not user:
         return False
-    if not verify_pass(user[0], password):
+    if(verify_pass(user[0], password) == False) :
         return False
     return user[0]
 
@@ -88,10 +90,14 @@ async def get_threads() -> dict:
     return { "data": threads }
 
 @app.get("/search/")
-async def search(search_query) -> dict:
+async def search(search_query, response: Response) -> dict:
     query = "SELECT threads.thread_id, threads.title, threads.date, forumuser.username FROM threads, forumuser WHERE threads.user_id = forumuser.user_id AND threads.title LIKE '%" + search_query +"%'"
     threads = await query_GET(query)
     print(threads)
+    if(not threads):
+        response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
+        return {'error' : 'invalid credentials'}
+
     json_output = []
     for thread in threads:
         json_output.append({"id": thread['thread_id'], "title": thread['title'], "date": str(thread['date']), "username": thread['username']})    
@@ -117,6 +123,8 @@ async def get_posts(thread_id) -> dict:
 @app.post('/token')
 async def generate_token(data: LoginModel, response: Response):
     user = await authentiate_user(data.username, data.password)
+        
+    print(user)
 
     if not user:
         response.status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
