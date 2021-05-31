@@ -48,3 +48,4 @@ ALTER TABLE public.threads
 
 ALTER TABLE public.posts
     OWNER to admin;
+
