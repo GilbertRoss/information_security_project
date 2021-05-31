@@ -142,14 +142,14 @@ async def generate_token(data: LoginModel, response: Response):
 @app.post('/createthread', response_model=CreateThreadModel)
 async def create_thread(thread:CreateThreadModel, response: Response):
     date =  str(datetime.datetime.now())
-    query_insert_thread = "INSERT INTO threads (thread_id, title, date,user_id) values (" + "'" + str(uuid.uuid4()) + "'," + "'" + thread.title +"'" + "," + "'" + date + "'" + "," + "'" + thread.user_id + "'" + ")"
-    query_get_threadID = "SELECT thread_id FROM threads where title = " + "'" + thread.title + "'"
-    print("outside try")
+    thread_uuid = str(uuid.uuid4())
+    query_insert_thread = "INSERT INTO threads (thread_id, title, date,user_id) values (" + "'" + thread_uuid + "'," + "'" + thread.title +"'" + "," + "'" + date + "'" + "," + "'" + thread.user_id + "'" + ")"
+    print(query_insert_thread)
 
     try:
         thread_obj = await query_POST(query_insert_thread)
-        thread_id = await query_GET(query_get_threadID)
-        query_insert_post = "INSERT INTO posts (post_id, post_text, date, thread_id, user_id) values (" + "'" + str(uuid.uuid4()) + "'," + "'" + thread.text +"'" + "," + "'" + date + "'" + "," + "'" + thread_id[0]['thread_id'] + "'," + "'" + thread.user_id + "')"
+        query_insert_post = "INSERT INTO posts (post_id, post_text, date, thread_id, user_id) values (" + "'" + str(uuid.uuid4()) + "'," + "'" + thread.text +"'" + "," + "'" + date + "'" + "," + "'" + thread_uuid + "'," + "'" + thread.user_id + "')"
+        print(query_insert_post)
         post_obj = await query_POST(query_insert_post)
     except Exception as e:
         print(e)
