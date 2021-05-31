@@ -6,7 +6,7 @@ services:
     restart: always
     build: ./frontend
     working_dir: /home/react/frontend
-    command: "yarn start"
+    command: "npm run start"
     volumes: 
       - ./frontend:/home/react/frontend
     ports:

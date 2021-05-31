@@ -4,14 +4,15 @@ FROM node:14-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /frontend
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN npm install --frozen-lockfile
+RUN npm install next
 
 # Rebuild the source code only when needed
 FROM node:14-alpine AS builder
 WORKDIR /frontend
 COPY . .
 COPY --from=deps /frontend/node_modules ./node_modules
-RUN yarn build
+RUN npm run build
 
 # Production image, copy all the files and run next
 FROM node:14-alpine AS runner
@@ -39,4 +40,4 @@ EXPOSE 3000
 # Uncomment the following line in case you want to disable telemetry.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
-CMD ["yarn", "start"]
+CMD ["npm", "run", "start"]
