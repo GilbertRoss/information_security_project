@@ -1,7 +1,7 @@
 # Dockerfile
 
 # Use node alpine as it's a small node image
-FROM node:alpine
+FROM node:14-alpine
 
 # Create the directory on the node image 
 # where our Next.js app will live
@@ -11,7 +11,7 @@ WORKDIR /user/src/app/frontend
 
 # Copy package.json and package-lock.json
 # to the /app working directory
-COPY package*.json /user/src/app/frontend
+COPY package*.json /user/src/app/frontend/
 
 # Install dependencies in /app
 RUN npm ci 
